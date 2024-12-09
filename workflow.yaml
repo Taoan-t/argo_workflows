@@ -1,20 +1,48 @@
+# apiVersion: argoproj.io/v1alpha1
+# kind: Workflow
+# metadata:
+#   generateName: js-script-workflow-
+# spec:
+#   entrypoint: js-script
+#   templates:
+#     - name: js-script
+#       container:
+#         image: node:16
+#         command: ["node", "/scripts/script.js"]
+#         volumeMounts:
+#           - name: git-volume
+#             mountPath: /scripts
+#       volumes:
+#         - name: git-volume
+#           gitRepo:
+#             repository: "https://github.com/Taoan-t/argo_workflows.git"
+#             revision: "master"
+#             directory: "."
+
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: js-script-workflow-
+  generateName: simple-js-project-
+  labels:
+    workflows.argoproj.io/archive-strategy: "false"
+  annotations:
+    workflows.argoproj.io/description: |
+      This workflow runs a JavaScript project in a Node.js container.
 spec:
-  entrypoint: js-script
+  entrypoint: run-js-project
   templates:
-    - name: js-script
+    - name: run-js-project
       container:
-        image: node:16
-        command: ["node", "/scripts/script.js"]
+        image: node:18-alpine # Node.js container image
+        command: ["node"]
+        args: ["script.js"] # Run the index.js file from the root directory
         volumeMounts:
-          - name: git-volume
-            mountPath: /scripts
-      volumes:
-        - name: git-volume
-          gitRepo:
-            repository: "https://github.com/Taoan-t/argo_workflows.git"
-            revision: "master"
-            directory: "."
+          - name: project-files
+            mountPath: /usr/src/app # Mount the Git repository to /usr/src/app
+        workingDir: /usr/src/app # Set the working directory to /usr/src/app to run the code from there
+  volumes:
+    - name: project-files
+      gitRepo:
+        repository: https://github.com/Taoan-t/argo_workflows.git # GitHub repository with your project
+        revision: master # Specify branch (e.g., "master" or "main")
+        directory: "." # Ensure it clones the root of the repository where index.js is located
