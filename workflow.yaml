@@ -16,5 +16,5 @@ spec:
         - name: git-volume
           gitRepo:
             repository: "https://github.com/Taoan-t/argo_workflows.git"
-            revision: "main"
+            revision: "master"
             directory: "."
