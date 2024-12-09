@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: js-script-workflow-
+spec:
+  entrypoint: js-script
+  templates:
+    - name: js-script
+      container:
+        image: node:16
+        command: ["node", "/scripts/script.js"]
+        volumeMounts:
+          - name: git-volume
+            mountPath: /scripts
+      volumes:
+        - name: git-volume
+          gitRepo:
+            repo: "https://github.com/your-username/your-repository.git"
+            revision: "main"
+            directory: "."
