@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: js-project
+spec:
+  replicas: 5
+  strategy:
+    canary:
+      steps:
+        - setWeight: 20
+        - pause: {}
+        - setWeight: 40
+        - pause: { duration: 10 }
+        - setWeight: 60
+        - pause: { duration: 10 }
+        - setWeight: 80
+        - pause: { duration: 10 }
+  selector:
+    matchLabels:
+      app: js-project
+  template:
+    metadata:
+      labels:
+        app: js-project
+    spec:
+      containers:
+        - name: node-container
+          image: node:18-alpine
+          command: ["node", "/usr/src/app/script.js"]
+          volumeMounts:
+            - name: project-files
+              mountPath: /usr/src/app
+      volumes:
+        - name: project-files
+          gitRepo:
+            repository: https://github.com/Taoan-t/argo_workflows.git
+            revision: master
+            directory: "."
